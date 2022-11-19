@@ -1,0 +1,1 @@
+[![Board Status](https://dev.azure.com/ferescobar-dev/709039b0-8bb4-4687-9d59-43f0b2d43575/b87e22d2-8252-4e25-8cc1-c35dd93eae3e/_apis/work/boardbadge/8c5ca6a1-aca2-4b88-8c79-c20c08d7d8b5)](https://dev.azure.com/ferescobar-dev/709039b0-8bb4-4687-9d59-43f0b2d43575/_boards/board/t/b87e22d2-8252-4e25-8cc1-c35dd93eae3e/Microsoft.RequirementCategory)
