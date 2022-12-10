@@ -1,30 +1,53 @@
 import './css/style.css';
-import { getPlanetsAsync } from './js/planets.js';
 
-let planets = [];
+const getPlanetsAsync = async () => {
+    try {
+        const url = 'https://planets-info-by-newbapi.p.rapidapi.com/api/v1/planet/list';
+        const apiKey = 'c5292ec436msha10e1e5b11ad502p151f59jsn866faf088301';
+        const host = 'planets-info-by-newbapi.p.rapidapi.com';
+
+        const resp = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'X-RapidAPI-Key': apiKey,
+                'X-RapidAPI-Host': host,
+            }
+        });
+
+        const listPlanets = await resp.json();
+        
+        return listPlanets;
+        
+    } catch (err) {
+        console.error(err);
+    }
+}
 
 const listPlanets = async () => {
 
-    const planetsLocal = localStorage.getItem('planetsLocal');
+    try{
+        const planetsLocal = localStorage.getItem('planetsLocal');
 
-    if(planetsLocal)
-    {
-        planets = JSON.parse(planetsLocal);
-    }
-    else
-    {
-        const planetsList = await getPlanetsAsync();
-
-        if(planetsList)
+        if(planetsLocal)
         {
-            localStorage.setItem('planetsLocal', JSON.stringify(planetsList));
-            planets = planetsList;
-        }        
+            return JSON.parse(planetsLocal);
+        }
+        else
+        {
+            const planetsList = await getPlanetsAsync();
+
+            if(planetsList)
+            {
+                localStorage.setItem('planetsLocal', JSON.stringify(planetsList));
+                return planetsList;
+            }        
+        }
     }
-    
+    catch (error) {
+        console.error(error);
+    }    
 }
 
-listPlanets();
 
 addEventListener('DOMContentLoaded', () => {
     const menu = document.querySelector('#menu');
@@ -33,58 +56,60 @@ addEventListener('DOMContentLoaded', () => {
     const descriptionPlanet = document.querySelector('#description');
     const img = document.createElement('img');
     img.className = 'img-planet';
+    
+    listPlanets().then((planets) => {
+
+        planets.forEach( ({name, key, description, imgSrc}) => {
+            const itemNav = document.createElement('a');
+            itemNav.textContent = name;
+            itemNav.setAttribute('data_key', key);
+
+            if(key === 'zmxk1zx92lo8')
+            {
+                itemNav.className = 'active';
+                const [ image ] = imgSrc;
+
+                img.src = image.img;
+                img.alt = image.description;            
+                imgContainer.appendChild(img);
+
+                title.textContent = name;
+                descriptionPlanet.textContent = description;
+            }
+
+            menu.appendChild(itemNav);
+        });
+
+        const items = document.querySelectorAll('#menu a');
+
+        items.forEach( item => {
+            item.addEventListener('click', () => {
+                
+                // Se selecciona el item activo para proceder a desactivarlo
+                const itemActive = document.querySelector('.active');
+                itemActive.classList.toggle('active')
+                
+                // Se optiene la key del item al que se hizo click
+                const keyItem = item.getAttribute('data_key');
+                const planetCurrent = planets.find( ({key}) => key === keyItem);
+                const { imgSrc, name, description } = planetCurrent;
+                const [ image ] = imgSrc;
+
+                img.src = image.img;
+                img.alt = image.description;            
+                imgContainer.appendChild(img);
+
+                title.textContent = name;
+                descriptionPlanet.textContent = description;
 
 
-    planets.forEach( ({name, key, description, imgSrc}) => {
-        const itemNav = document.createElement('a');
-        itemNav.textContent = name;
-        itemNav.setAttribute('data_key', key);
-
-        if(key === 'zmxk1zx92lo8')
-        {
-            itemNav.className = 'active';
-            const [ image ] = imgSrc;
-
-            img.src = image.img;
-            img.alt = image.description;            
-            imgContainer.appendChild(img);
-
-            title.textContent = name;
-            descriptionPlanet.textContent = description;
-        }
-
-        menu.appendChild(itemNav);
-    });
-
-    const items = document.querySelectorAll('#menu a');
-
-    items.forEach( item => {
-        item.addEventListener('click', () => {
-            
-            // Se selecciona el item activo para proceder a desactivarlo
-            const itemActive = document.querySelector('.active');
-            itemActive.classList.toggle('active')
-            
-            // Se optiene la key del item al que se hizo click
-            const keyItem = item.getAttribute('data_key');
-            const planetCurrent = planets.find( ({key}) => key === keyItem);
-            const { imgSrc, name, description } = planetCurrent;
-            const [ image ] = imgSrc;
-
-            img.src = image.img;
-            img.alt = image.description;            
-            imgContainer.appendChild(img);
-
-            title.textContent = name;
-            descriptionPlanet.textContent = description;
+                item.classList.toggle('active');
 
 
-            item.classList.toggle('active');
-
-
+            });
         });
     });
-
+    
 });
 
 /* const promesa = new Promise((resolve, reject) => {
